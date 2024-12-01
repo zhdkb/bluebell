@@ -1,0 +1,24 @@
+{"level":"DEBUG","time":"2024-12-01T14:26:53.329+0800","caller":"bluebell/main.go:34","msg":"logger init success..."}
+{"level":"ERROR","time":"2024-12-01T14:26:53.352+0800","caller":"mysql/mysql.go:25","msg":"connect DB failed","error":"dial tcp 127.0.0.1:13306: connectex: No connection could be made because the target machine actively refused it."}
+{"level":"DEBUG","time":"2024-12-01T14:59:22.905+0800","caller":"bluebell/main.go:34","msg":"logger init success..."}
+{"level":"ERROR","time":"2024-12-01T14:59:22.926+0800","caller":"mysql/mysql.go:25","msg":"connect DB failed","error":"dial tcp 127.0.0.1:13306: connectex: No connection could be made because the target machine actively refused it."}
+{"level":"DEBUG","time":"2024-12-01T15:34:08.450+0800","caller":"bluebell/main.go:34","msg":"logger init success..."}
+{"level":"ERROR","time":"2024-12-01T15:34:08.473+0800","caller":"mysql/mysql.go:25","msg":"connect DB failed","error":"Error 1045 (28000): Access denied for user ''@'localhost' (using password: YES)"}
+{"level":"DEBUG","time":"2024-12-01T15:34:25.120+0800","caller":"bluebell/main.go:34","msg":"logger init success..."}
+{"level":"ERROR","time":"2024-12-01T15:34:25.140+0800","caller":"mysql/mysql.go:25","msg":"connect DB failed","error":"dial tcp 127.0.0.1:13306: connectex: No connection could be made because the target machine actively refused it."}
+{"level":"DEBUG","time":"2024-12-01T15:36:16.884+0800","caller":"bluebell/main.go:34","msg":"logger init success..."}
+{"level":"ERROR","time":"2024-12-01T15:36:16.906+0800","caller":"mysql/mysql.go:25","msg":"connect DB failed","error":"Error 1049 (42000): Unknown database 'sql_demo'"}
+{"level":"DEBUG","time":"2024-12-01T15:36:49.794+0800","caller":"bluebell/main.go:34","msg":"logger init success..."}
+{"level":"DEBUG","time":"2024-12-01T15:43:25.882+0800","caller":"bluebell/main.go:34","msg":"logger init success..."}
+{"level":"DEBUG","time":"2024-12-01T15:43:38.664+0800","caller":"bluebell/main.go:34","msg":"logger init success..."}
+{"level":"INFO","time":"2024-12-01T15:43:47.145+0800","caller":"bluebell/main.go:70","msg":"Shutdown Server ..."}
+{"level":"INFO","time":"2024-12-01T15:43:47.145+0800","caller":"bluebell/main.go:79","msg":"Server exiting"}
+{"level":"DEBUG","time":"2024-12-01T15:44:17.648+0800","caller":"bluebell/main.go:34","msg":"logger init success..."}
+{"level":"INFO","time":"2024-12-01T15:44:19.686+0800","caller":"bluebell/main.go:70","msg":"Shutdown Server ..."}
+{"level":"INFO","time":"2024-12-01T15:44:19.686+0800","caller":"bluebell/main.go:79","msg":"Server exiting"}
+{"level":"DEBUG","time":"2024-12-01T16:29:23.860+0800","caller":"bluebell/main.go:34","msg":"logger init success..."}
+{"level":"INFO","time":"2024-12-01T16:29:26.046+0800","caller":"bluebell/main.go:70","msg":"Shutdown Server ..."}
+{"level":"INFO","time":"2024-12-01T16:29:26.047+0800","caller":"bluebell/main.go:79","msg":"Server exiting"}
+{"level":"DEBUG","time":"2024-12-01T16:32:15.486+0800","caller":"bluebell/main.go:34","msg":"logger init success..."}
+{"level":"INFO","time":"2024-12-01T16:32:17.851+0800","caller":"bluebell/main.go:70","msg":"Shutdown Server ..."}
+{"level":"INFO","time":"2024-12-01T16:32:17.852+0800","caller":"bluebell/main.go:79","msg":"Server exiting"}
