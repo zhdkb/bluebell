@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"bluebell/controllers"
 	"bluebell/logger"
 	"net/http"
 
@@ -12,8 +13,11 @@ func Setup() *gin.Engine {
 
 	r.Use(logger.GinLogger(), logger.GinRecovery(true))
 
-	r.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "ok")
+	// 注册业务路由
+	r.POST("/signup", controllers.SignupHandler)
+
+	r.GET("/ping", func(c *gin.Context) {
+		c.String(http.StatusOK, "pong")
 	})
 	return r
 }
