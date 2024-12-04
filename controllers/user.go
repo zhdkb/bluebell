@@ -20,20 +20,17 @@ func SignupHandler(c *gin.Context) {
 		// 判断err是不是validator类型
 		errs, ok := err.(validator.ValidationErrors)
 		if !ok {
-			c.JSON(http.StatusOK, gin.H{
-				"msg": err.Error(),
-			})
+			ResponseError(c, CodeInvalidParam)
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"msg": removeTopStruct(errs.Translate(trans)), // 翻译错误
-		})
+		ResponseErrorWithMsg(c, CodeInvalidParam, removeTopStruct(errs.Translate(trans)))
 		return
 	}
 		
 	// 业务处理
 	if err := logic.SignUp(p); err != nil {
+		zap.L().Error("logic.Signup failed", zap.Error(err))
 		c.JSON(http.StatusOK, gin.H{
 			"msg": err.Error(),
 		})
