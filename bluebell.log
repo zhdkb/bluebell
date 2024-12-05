@@ -171,3 +171,7 @@
 {"level":"ERROR","time":"2024-12-03T17:29:23.796+0800","caller":"controllers/user.go:71","msg":"logic.Login failed","username":"sl","error":"用户不存在"}
 {"level":"INFO","time":"2024-12-03T17:29:23.796+0800","caller":"logger/logger.go:79","msg":"/login","status":200,"method":"POST","path":"/login","query":"","ip":"127.0.0.1","user-agent":"PostmanRuntime/7.43.0","errors":"","cost":0.0109617}
 {"level":"DEBUG","time":"2024-12-03T20:17:19.010+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
+{"level":"DEBUG","time":"2024-12-05T13:43:46.319+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
+{"level":"INFO","time":"2024-12-05T13:44:02.168+0800","caller":"logger/logger.go:83","msg":"/login","status":200,"method":"POST","path":"/login","query":"","ip":"127.0.0.1","user-agent":"PostmanRuntime/7.43.0","errors":"","cost":0.0025028}
+{"level":"DEBUG","time":"2024-12-05T13:44:57.146+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
+{"level":"INFO","time":"2024-12-05T13:45:07.440+0800","caller":"logger/logger.go:83","msg":"/login","status":200,"method":"POST","path":"/login","query":"","ip":"127.0.0.1","user-agent":"PostmanRuntime/7.43.0","errors":"","cost":0.0028032}

@@ -68,6 +68,10 @@ func getLogWriter(filename string, maxSize, maxBackup, maxAge int) zapcore.Write
 }
 
 // GinLogger 接收gin框架默认的日志
+// GinLogger 是一个自定义的 Gin 日志中间件，
+// 它的作用是在每次 HTTP 请求时记录请求的信息，
+// 并且在请求处理完后记录日志，
+// 包含请求的路径、方法、状态码、查询参数等。
 func GinLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
@@ -90,6 +94,9 @@ func GinLogger() gin.HandlerFunc {
 }
 
 // GinRecovery recover掉项目可能出现的panic，并使用zap记录相关日志
+// GinRecovery 是一个用于处理 panic（崩溃）情况的中间件，
+// 它的作用是在发生 panic 时，
+// 能够捕获并恢复异常，同时记录相关的日志信息。
 func GinRecovery(stack bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {

@@ -10,6 +10,10 @@ import (
 	"go.uber.org/zap"
 )
 
+// gin.Context 是一个非常重要的结构体，
+// 它承载着 HTTP 请求的上下文信息，
+// 包含了请求、响应、路由、以及与请求生命周期相关的一些方法。
+
 // SignupHandler 处理注册请求的函数
 func SignupHandler(c *gin.Context) {
 	// 获取参数和参数校验
@@ -27,7 +31,7 @@ func SignupHandler(c *gin.Context) {
 		ResponseErrorWithMsg(c, CodeInvalidParam, removeTopStruct(errs.Translate(trans)))
 		return
 	}
-		
+
 	// 业务处理
 	if err := logic.SignUp(p); err != nil {
 		zap.L().Error("logic.Signup failed", zap.Error(err))
@@ -64,7 +68,8 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	// 业务逻辑处理
-	if err := logic.Login(p); err != nil {
+	token, err := logic.Login(p)
+	if err != nil {
 		zap.L().Error("logic.Login failed", zap.String("username", p.Username), zap.Error(err))
 		c.JSON(http.StatusOK, gin.H{
 			"msg": "用户名或密码错误",
@@ -73,8 +78,6 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	// 返回响应
-	c.JSON(http.StatusOK, gin.H{
-		"msg": "登录成功",
-	})
+	ResponseSuccess(c, token)
 
 }
