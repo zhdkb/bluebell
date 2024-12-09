@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-const TokenExpireDuration = time.Hour * 2
+const TokenExpireDuration = time.Hour * 24 * 365
 
 var mySecret = []byte("夏天夏天悄悄过去")
 

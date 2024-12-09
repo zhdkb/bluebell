@@ -21,14 +21,24 @@ func Setup(mode string) *gin.Engine {
 
 	r.Use(logger.GinLogger(), logger.GinRecovery(true))
 
+	v1 := r.Group("/api/v1")
 	// 注册业务路由
-	r.POST("/signup", controllers.SignupHandler)
-	r.POST("/login", controllers.LoginHandler)
+	v1.POST("/signup", controllers.SignupHandler)
+	v1.POST("/login", controllers.LoginHandler)
 
-	r.GET("/ping", middlewares.JWTAuthMiddleware(), func(c *gin.Context) {
-		// 如果是登录的用户，判断请求头中是否有 有效的JWT
-		c.String(http.StatusOK, "pong")
+	v1.Use(middlewares.JWTAuthMiddleware()) // 应用JWT认证中间件
+
+	{
+		v1.GET("/community", controllers.CommunityHandler)
+		v1.GET("/community/:id", controllers.CommunityDetailHandler)
+	}
+
+	r.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"msg": "404",
+		})
 	})
+	
 	return r
 }
 
