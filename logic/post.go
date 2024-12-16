@@ -96,8 +96,14 @@ func GetPostList2(p *models.ParamPostList) (data []*models.ApiPostDetail, err er
 		return
 	}
 
+	// 提前查询好每篇帖子的投票数
+	voteData, err := redis.GetPostVoteData(ids)
+	if err != nil {
+		return
+	}
+
 	data = make([]*models.ApiPostDetail, 0, len(posts))
-	for _, post := range(posts) {
+	for i, post := range(posts) {
 		user, err := mysql.GetUserById(post.AuthorID)
 		if err != nil {
 			zap.L().Error("mysql.GetUserById(pid) failed", zap.Error(err))
@@ -111,6 +117,7 @@ func GetPostList2(p *models.ParamPostList) (data []*models.ApiPostDetail, err er
 		}
 		postdetail := &models.ApiPostDetail{
 			AuthorName: user.Username,
+			VoteNum: voteData[i],
 			Post: post,
 			CommunityDetail: community,
 		}

@@ -30,11 +30,12 @@ direction=-1时，有两种情况：
 
 const (
 	oneWeekInSeconds = 7 * 24 * 3600
+	scorePreVote = 432 // 每一票值多少分
 )
 
 var (
 	ErrVoteTimeExpire = errors.New("投票时间已过")
-	scorePreVote = 432 // 每一票值多少分
+	ErrVoteRepested = errors.New("不允许重复投票")
 )
 
 func CreatePost(postID int64) error {
@@ -67,6 +68,9 @@ func VoteForPost(userID, postID string, value float64) error {
 	// 2.更新帖子的分数
 	// 先查当前用户给当前帖子的投票记录
 	ov := rdb.ZScore(getRedisKey(KeyPostVotedZsetPre + postID), userID).Val()
+	if value == ov {
+		return ErrVoteRepested
+	}
 	var dir float64
 	if value > ov {
 		dir = 1
