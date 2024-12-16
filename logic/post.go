@@ -79,3 +79,42 @@ func GetPostList(page, size int64) (data []*models.ApiPostDetail, err error) {
 	}
 	return
 }
+
+func GetPostList2(p *models.ParamPostList) (data []*models.ApiPostDetail, err error) {
+	// 去redis查询ID列表
+	ids, err := redis.GetPostIDsInorder(p)
+	if err != nil {
+		return
+	}
+	if len(ids) == 0 {
+		zap.L().Warn("redis.GetPostIDsInorder(p) return 0 data")
+		return
+	}
+    // 根据id去MySQL数据库查询帖子详细信息
+	posts, err := mysql.GetPostListByIDs((ids))
+	if err != nil {
+		return
+	}
+
+	data = make([]*models.ApiPostDetail, 0, len(posts))
+	for _, post := range(posts) {
+		user, err := mysql.GetUserById(post.AuthorID)
+		if err != nil {
+			zap.L().Error("mysql.GetUserById(pid) failed", zap.Error(err))
+			continue
+		}
+		// 根据社区id查询社区详细信息
+		community, err := mysql.GetCommunityDetailByID(post.CommunityID)
+		if err != nil {
+			zap.L().Error("mysql.GetCommunityDetailByID(pid) failed", zap.Error(err))
+			continue
+		}
+		postdetail := &models.ApiPostDetail{
+			AuthorName: user.Username,
+			Post: post,
+			CommunityDetail: community,
+		}
+		data = append(data, postdetail)
+	}
+	return
+}
