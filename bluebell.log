@@ -319,3 +319,10 @@
 {"level":"INFO","time":"2024-12-16T14:06:30.408+0800","caller":"logger/logger.go:83","msg":"/api/v1/posts2","status":200,"method":"GET","path":"/api/v1/posts2","query":"pages=1&size=2&order=time","ip":"127.0.0.1","user-agent":"PostmanRuntime/7.43.0","errors":"","cost":0.0110233}
 {"level":"DEBUG","time":"2024-12-16T14:30:19.501+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
 {"level":"INFO","time":"2024-12-16T14:30:23.834+0800","caller":"logger/logger.go:83","msg":"/api/v1/posts2","status":200,"method":"GET","path":"/api/v1/posts2","query":"pages=1&size=2&order=time","ip":"127.0.0.1","user-agent":"PostmanRuntime/7.43.0","errors":"","cost":0.0039127}
+{"level":"DEBUG","time":"2024-12-18T13:41:19.713+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
+{"level":"DEBUG","time":"2024-12-18T13:41:45.552+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
+{"level":"DEBUG","time":"2024-12-18T13:42:09.753+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
+{"level":"ERROR","time":"2024-12-18T13:42:09.781+0800","caller":"mysql/mysql.go:25","msg":"connect DB failed","error":"dial tcp 127.0.0.1:3308: connectex: No connection could be made because the target machine actively refused it."}
+{"level":"DEBUG","time":"2024-12-18T13:42:24.889+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
+{"level":"DEBUG","time":"2024-12-18T13:47:44.336+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
+{"level":"DEBUG","time":"2024-12-18T13:47:53.450+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
