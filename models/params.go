@@ -31,6 +31,6 @@ type ParamVoteData struct {
 type ParamPostList struct {
 	CommunityID		int64		`json:"community_id" form:"community_id"`
 	Page			int64		`json:"page" form:"page"`
-	Size			int64		`json:"szie" form:"size"`
+	Size			int64		`json:"size" form:"size"`
 	Order			string		`json:"order" form:"order"`
 }

@@ -326,3 +326,4 @@
 {"level":"DEBUG","time":"2024-12-18T13:42:24.889+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
 {"level":"DEBUG","time":"2024-12-18T13:47:44.336+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
 {"level":"DEBUG","time":"2024-12-18T13:47:53.450+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
+{"level":"DEBUG","time":"2024-12-24T14:47:44.734+0800","caller":"bluebell/main.go:28","msg":"logger init success..."}
