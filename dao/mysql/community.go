@@ -9,12 +9,16 @@ import (
 )
 
 func GetCommunityList() (data []*models.Community, err error) {
-	sqlStr := "select community_id, community_name from community"
-	if err = db.Select(&data, sqlStr); err != nil {
+	sqlStr := `select community_id, community_name from community`
+	// db.Select(&data, sqlStr)
+	if err = db.Raw(sqlStr).Scan(&data).Error; err != nil {
 		if err == sql.ErrNoRows {
 			zap.L().Warn("there is no community in db")
 			err = nil
 		}
+	}
+	for _, i := range data {
+		fmt.Println(i)
 	}
 	return
 }
@@ -25,8 +29,8 @@ func GetCommunityDetailByID(id int64) (community *models.CommunityDetail, err er
 	sqlStr := `select community_id, community_name, introduction, create_time
 				from community
 				where community_id = ?`
-	
-	if err = db.Get(community, sqlStr, id); err != nil {
+	// db.Get(community, sqlStr, id)
+	if err = db.Raw(sqlStr, id).Scan(&community).Error; err != nil {
 		if err == sql.ErrNoRows {
 			err = ErrorInvalidID
 		}

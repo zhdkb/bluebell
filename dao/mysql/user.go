@@ -15,9 +15,13 @@ const secret = "sunliulei"
 
 // CheckUserExist 检查指定用户名是否存在
 func CheckUserExist(username string) (err error) {
+	if db == nil {
+        return errors.New("database connection is nil")
+    }
 	sqlStr := `select count(user_id) from user where username = ?`
-	var  count int
-	if err = db.Get(&count, sqlStr, username); err != nil {
+	var count int
+	// db.Get(&count, sqlStr, username);
+	if err = db.Raw(sqlStr, username).Scan(&count).Error; err != nil {
 		return err
 	}
 	if count > 0 {
@@ -32,7 +36,7 @@ func InsertUser(user *models.User) (err error) {
 	user.Password = encryptPassword(user.Password)
 	// 执行SQL语句入库
 	sqlStr := `insert into user(user_id, username, password) values(?,?,?)`
-	_, err = db.Exec(sqlStr, user.UserID, user.Username, user.Password)
+	err = db.Exec(sqlStr, user.UserID, user.Username, user.Password).Error
 	return
 }
 
@@ -45,7 +49,8 @@ func encryptPassword(oPassword string) string {
 func Login(user *models.User) (err error) {
 	oPassword := user.Password //用户登录的密码
 	sqlStr := `select user_id, username, password from user where username = ?`
-	err = db.Get(user, sqlStr, user.Username)
+	// err = db.Get(user, sqlStr, user.Username)
+	err = db.Raw(sqlStr, user.Username).Scan(user).Error
 	if err == sql.ErrNoRows {
 		return errors.New("用户不存在")
 	}
@@ -66,6 +71,7 @@ func Login(user *models.User) (err error) {
 func GetUserById(uid int64) (user *models.User, err error) {
 	user = new(models.User)
 	sqlStr := `select user_id, username from user where user_id = ?`
-	err = db.Get(user, sqlStr, uid)
+	// err = db.Get(user, sqlStr, uid)
+	err = db.Raw(sqlStr, uid).Scan(user).Error
 	return
 }
