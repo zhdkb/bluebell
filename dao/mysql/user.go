@@ -15,14 +15,14 @@ import (
 const secret = "sunliulei"
 
 // CheckUserExist 检查指定用户名是否存在
-func CheckUserExist(username string) (err error) {
+func CheckUserExist(ctx context.Context, username string) (err error) {
 	if db == nil {
         return errors.New("database connection is nil")
     }
 	sqlStr := `select count(user_id) from user where username = ?`
 	var count int
 	// db.Get(&count, sqlStr, username);
-	if err = db.Raw(sqlStr, username).Scan(&count).Error; err != nil {
+	if err = db.WithContext(ctx).Raw(sqlStr, username).Scan(&count).Error; err != nil {
 		return err
 	}
 	if count > 0 {

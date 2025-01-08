@@ -39,13 +39,13 @@ func GetPostList(ctx context.Context, page, size int64) (posts []*models.Post, e
 }
 
 // GetPostListByIDs 根据给定的id列表查询帖子数据
-func GetPostListByIDs(ids []string) (postList []*models.Post, err error) {
+func GetPostListByIDs(ctx context.Context, ids []string) (postList []*models.Post, err error) {
 	idString := strings.Join(ids, ",")
 	sqlStr := `select post_id, title, content, author_id, community_id, create_time
 				from post
 				where post_id in (?)
 				order by FIND_IN_SET(post_id, ?)`
-	err = db.Raw(sqlStr, idString, idString).Scan(&postList).Error
+	err = db.WithContext(ctx).Raw(sqlStr, idString, idString).Scan(&postList).Error
 	// query, args, err := sqlx.In(sqlStr, ids, strings.Join(ids, ","))
 	// if err != nil {
 	// 	return nil, err

@@ -12,7 +12,7 @@ import (
 
 func SignUp(ctx context.Context, p *models.ParamSignUp) (err error) {
 	// 判断用户存不存在
-	if err = mysql.CheckUserExist(p.Username); err != nil {
+	if err = mysql.CheckUserExist(ctx, p.Username); err != nil {
 		// 数据库查询出错
 		return err
 	}

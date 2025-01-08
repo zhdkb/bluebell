@@ -92,7 +92,7 @@ func GetPostList2(ctx context.Context, p *models.ParamPostList) (data []*models.
 		return
 	}
     // 根据id去MySQL数据库查询帖子详细信息
-	posts, err := mysql.GetPostListByIDs((ids))
+	posts, err := mysql.GetPostListByIDs(ctx, ids)
 	if err != nil {
 		return
 	}
@@ -139,7 +139,7 @@ func GetCommunityPostList(ctx context.Context, p *models.ParamPostList) (data []
 		return
 	}
     // 根据id去MySQL数据库查询帖子详细信息
-	posts, err := mysql.GetPostListByIDs((ids))
+	posts, err := mysql.GetPostListByIDs(ctx, ids)
 	if err != nil {
 		return
 	}
