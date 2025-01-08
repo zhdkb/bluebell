@@ -21,7 +21,7 @@ func Setup(mode string) *gin.Engine {
 
 	r.Use(logger.GinLogger(), logger.GinRecovery(true))
 
-	v1 := r.Group("/api/v1")
+	v1 := r.Group("/api/v1").Use(controllers.TimeoutMiddleware())
 	// 注册业务路由
 	v1.POST("/signup", controllers.SignupHandler)
 	v1.POST("/login", controllers.LoginHandler)

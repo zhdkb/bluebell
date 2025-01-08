@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"bluebell/models"
+	"context"
 	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
@@ -31,12 +32,12 @@ func CheckUserExist(username string) (err error) {
 }
 
 // InsertUser 像数据库中插入一条新的用户记录
-func InsertUser(user *models.User) (err error) {
+func InsertUser(ctx context.Context, user *models.User) (err error) {
 	// 对密码进行加密
 	user.Password = encryptPassword(user.Password)
 	// 执行SQL语句入库
 	sqlStr := `insert into user(user_id, username, password) values(?,?,?)`
-	err = db.Exec(sqlStr, user.UserID, user.Username, user.Password).Error
+	err = db.WithContext(ctx).Exec(sqlStr, user.UserID, user.Username, user.Password).Error
 	return
 }
 

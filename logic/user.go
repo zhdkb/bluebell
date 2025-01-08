@@ -5,11 +5,12 @@ import (
 	"bluebell/models"
 	"bluebell/pkg/jwt"
 	"bluebell/pkg/snowflake"
+	"context"
 )
 
 // 存放业务逻辑的代码
 
-func SignUp(p *models.ParamSignUp) (err error) {
+func SignUp(ctx context.Context, p *models.ParamSignUp) (err error) {
 	// 判断用户存不存在
 	if err = mysql.CheckUserExist(p.Username); err != nil {
 		// 数据库查询出错
@@ -25,7 +26,7 @@ func SignUp(p *models.ParamSignUp) (err error) {
 		Password: 	p.Password,
 	}
 	// 保存进数据库
-	return mysql.InsertUser(user)
+	return mysql.InsertUser(ctx, user)
 	// redis.xxx
 }
 

@@ -34,7 +34,7 @@ func SignupHandler(c *gin.Context) {
 	}
 
 	// 业务处理
-	if err := logic.SignUp(p); err != nil {
+	if err := logic.SignUp(c.Request.Context(), p); err != nil {
 		zap.L().Error("logic.Signup failed", zap.Error(err))
 		c.JSON(http.StatusOK, gin.H{
 			"msg": err.Error(),
