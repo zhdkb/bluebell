@@ -30,14 +30,14 @@ func SignUp(ctx context.Context, p *models.ParamSignUp) (err error) {
 	// redis.xxx
 }
 
-func Login(p *models.ParamLogin) (user *models.User, err error) {
+func Login(ctx context.Context, p *models.ParamLogin) (user *models.User, err error) {
 	user = &models.User{
 		Username: p.Username,
 		Password: p.Password,
 	}
 
 	// 传递的是指针，就能拿到userID
-	if err := mysql.Login(user); err != nil {
+	if err := mysql.Login(ctx, user); err != nil {
 		return nil, err
 	}
 

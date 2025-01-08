@@ -1,12 +1,13 @@
 package redis
 
 import (
+	"context"
 	"errors"
 	"math"
 	"strconv"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 )
 
 // 本项目使用简化版的投票分数
@@ -39,31 +40,31 @@ var (
 	ErrVoteRepested = errors.New("不允许重复投票")
 )
 
-func CreatePost(postID, communityID int64) error {
+func CreatePost(ctx context.Context, postID, communityID int64) error {
 
 	pipeline := rdb.TxPipeline()
 
-	pipeline.ZAdd(getRedisKey(KeyPostTimeZSet), redis.Z{
+	pipeline.ZAdd(ctx, getRedisKey(KeyPostTimeZSet), &redis.Z{
 		Score: float64(time.Now().Unix()),
 		Member: postID,
 	})
 
-	pipeline.ZAdd(getRedisKey(KeyPostScoreZSet), redis.Z{
+	pipeline.ZAdd(ctx, getRedisKey(KeyPostScoreZSet), &redis.Z{
 		Score: float64(time.Now().Unix()),
 		Member: postID,
 	})
 
 	// 把帖子id加到社区的set
 	cKey := getRedisKey(KeyCommunitySetPF + strconv.Itoa(int(communityID)))
-	pipeline.SAdd(cKey, postID)
-	_, err := pipeline.Exec()
+	pipeline.SAdd(ctx, cKey, postID)
+	_, err := pipeline.Exec(ctx)
 
 	return err
 }
 
-func VoteForPost(userID, postID string, value float64) error {
+func VoteForPost(ctx context.Context, userID, postID string, value float64) error {
 	// 1.判断投票的限制
-	postTime := rdb.ZScore(getRedisKey(KeyPostTimeZSet), postID).Val()
+	postTime := rdb.ZScore(ctx, getRedisKey(KeyPostTimeZSet), postID).Val()
 	if float64(time.Now().Unix()) - postTime > oneWeekInSeconds {
 		return ErrVoteTimeExpire
 	}
@@ -72,7 +73,7 @@ func VoteForPost(userID, postID string, value float64) error {
 
 	// 2.更新帖子的分数
 	// 先查当前用户给当前帖子的投票记录
-	ov := rdb.ZScore(getRedisKey(KeyPostVotedZsetPre + postID), userID).Val()
+	ov := rdb.ZScore(ctx, getRedisKey(KeyPostVotedZsetPre + postID), userID).Val()
 	if value == ov {
 		return ErrVoteRepested
 	}
@@ -85,19 +86,19 @@ func VoteForPost(userID, postID string, value float64) error {
 	diff := math.Abs(ov - value) // 计算两次投票的差值
 
 	pipeline := rdb.TxPipeline()
-	pipeline.ZIncrBy(getRedisKey(KeyPostScoreZSet), dir * diff * float64(scorePreVote), postID)
+	pipeline.ZIncrBy(ctx, getRedisKey(KeyPostScoreZSet), dir * diff * float64(scorePreVote), postID)
 
 	// 3.记录用户为该帖子投过票
 	if value == 0 {
-		pipeline.ZRem(getRedisKey(KeyPostVotedZsetPre + postID), userID)
+		pipeline.ZRem(ctx, getRedisKey(KeyPostVotedZsetPre + postID), userID)
 	} else {
-		pipeline.ZAdd(getRedisKey(KeyPostVotedZsetPre + postID), redis.Z{
+		pipeline.ZAdd(ctx, getRedisKey(KeyPostVotedZsetPre + postID), &redis.Z{
 			Score: value, // 赞成票还是反对票
 			Member: userID,
 		})
 	}
 
-	_, err := pipeline.Exec()
+	_, err := pipeline.Exec(ctx)
 	return err
 
 }

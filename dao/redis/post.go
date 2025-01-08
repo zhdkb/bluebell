@@ -2,20 +2,21 @@ package redis
 
 import (
 	"bluebell/models"
+	"context"
 	"strconv"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 )
 
-func getIDsFromKey(key string, page, size int64) ([]string, error) {
+func getIDsFromKey(ctx context.Context, key string, page, size int64) ([]string, error) {
 	start := (page - 1) * size
 	end := start + size - 1
 	// ZRevRange 按分数从大到小查询指定数量的元素查询
-	return rdb.ZRevRange(key, start, end).Result()
+	return rdb.ZRevRange(ctx, key, start, end).Result()
 }
 
-func GetPostIDsInorder(p *models.ParamPostList) ([]string, error) {
+func GetPostIDsInorder(ctx context.Context, p *models.ParamPostList) ([]string, error) {
 	// 从redis获取id
 	// 根据用户请求中携带的order参数查询id
 	key := getRedisKey(KeyPostTimeZSet)
@@ -24,16 +25,16 @@ func GetPostIDsInorder(p *models.ParamPostList) ([]string, error) {
 	}
 
 	// 确定查询的索引起始点
-	return getIDsFromKey(key, p.Page, p.Size)
+	return getIDsFromKey(ctx, key, p.Page, p.Size)
 }
 
 // GetPostVoteData 根据ids查询每篇帖子的投赞成票的数据
-func GetPostVoteData(ids []string) (data []int64, err error) {
+func GetPostVoteData(ctx context.Context, ids []string) (data []int64, err error) {
 	data = make([]int64, 0)
 	for _, id := range(ids) {
 		key := getRedisKey(KeyPostVotedZsetPre + id)
 		// 查找key中分数是1的元素的数量 -> 统计每篇帖子的赞成票的数量
-		v1 := rdb.ZCount(key, "1", "1").Val()
+		v1 := rdb.ZCount(ctx, key, "1", "1").Val()
 		data = append(data, v1)
 	}
 
@@ -56,7 +57,7 @@ func GetPostVoteData(ids []string) (data []int64, err error) {
 }
 
 // GetCommunityPostIDsInorder 按社区查询ids
-func GetCommunityPostIDsInorder(p *models.ParamPostList) ([]string, error) {
+func GetCommunityPostIDsInorder(ctx context.Context, p *models.ParamPostList) ([]string, error) {
 	orderKey := getRedisKey(KeyPostTimeZSet)
 	if p.Order == models.OrderScore {
 		orderKey = getRedisKey(KeyPostScoreZSet)
@@ -70,18 +71,19 @@ func GetCommunityPostIDsInorder(p *models.ParamPostList) ([]string, error) {
 
 	// 利用缓存key减少zinterstore执行的次数
 	key := orderKey + strconv.Itoa(int(p.CommunityID))
-	if rdb.Exists(key).Val() < 1 {
+	if rdb.Exists(ctx, key).Val() < 1 {
 		// 不存在，需要计算
 		pipeline := rdb.Pipeline()
-		pipeline.ZInterStore(key, redis.ZStore{
+		pipeline.ZInterStore(ctx, key, &redis.ZStore{
 			Aggregate: "MAX",
-		}, cKey, orderKey) // ZInterStore 计算
-		pipeline.Expire(key, 60 * time.Second)
-		_, err := pipeline.Exec()
+			Keys:      []string{cKey, orderKey},
+		}) // ZInterStore 计算
+		pipeline.Expire(ctx, key, 60 * time.Second)
+		_, err := pipeline.Exec(ctx)
 		if err != nil {
 			return nil, err
 		}
 	}
 	// 存在的话就直接根据key查询ids
-	return getIDsFromKey(key, p.Page, p.Size)
+	return getIDsFromKey(ctx, key, p.Page, p.Size)
 }

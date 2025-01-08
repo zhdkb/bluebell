@@ -47,11 +47,11 @@ func encryptPassword(oPassword string) string {
 	return hex.EncodeToString(h.Sum([]byte(oPassword)))
 }
 
-func Login(user *models.User) (err error) {
+func Login(ctx context.Context, user *models.User) (err error) {
 	oPassword := user.Password //用户登录的密码
 	sqlStr := `select user_id, username, password from user where username = ?`
 	// err = db.Get(user, sqlStr, user.Username)
-	err = db.Raw(sqlStr, user.Username).Scan(user).Error
+	err = db.WithContext(ctx).Raw(sqlStr, user.Username).Scan(user).Error
 	if err == sql.ErrNoRows {
 		return errors.New("用户不存在")
 	}
@@ -69,10 +69,10 @@ func Login(user *models.User) (err error) {
 }
 
 // GetUserById 根据id获取用户信息
-func GetUserById(uid int64) (user *models.User, err error) {
+func GetUserById(ctx context.Context, uid int64) (user *models.User, err error) {
 	user = new(models.User)
 	sqlStr := `select user_id, username from user where user_id = ?`
 	// err = db.Get(user, sqlStr, uid)
-	err = db.Raw(sqlStr, uid).Scan(user).Error
+	err = db.WithContext(ctx).Raw(sqlStr, uid).Scan(user).Error
 	return
 }

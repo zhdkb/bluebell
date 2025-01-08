@@ -2,30 +2,31 @@ package mysql
 
 import (
 	"bluebell/models"
+	"context"
 	"strings"
 )
 
-func CreatePost(p *models.Post) (err error) {
+func CreatePost(ctx context.Context, p *models.Post) (err error) {
 	sqlStr := `insert into post
 				(post_id, title, content, author_id, community_id)
 				values (?, ?, ?, ?, ?)`
-	err = db.Exec(sqlStr, p.ID, p.Title, p.Content, p.AuthorID, p.CommunityID).Error
+	err = db.WithContext(ctx).Exec(sqlStr, p.ID, p.Title, p.Content, p.AuthorID, p.CommunityID).Error
 	return
 }
 
 // GetPostById 根据id查询单个帖子数据
-func GetPostById(pid int64) (post *models.Post, err error) {
+func GetPostById(ctx context.Context, pid int64) (post *models.Post, err error) {
 	post = new(models.Post)
 	sqlStr := `select post_id, title, content, author_id, community_id, create_time 
 				from post 
 				where post_id = ?`
 	// result := db.First(post, pid)
-	err = db.Raw(sqlStr, pid).Scan(&post).Error
+	err = db.WithContext(ctx).Raw(sqlStr, pid).Scan(&post).Error
 	return
 }
 
 // GetPostList 查询帖子列表函数
-func GetPostList(page, size int64) (posts []*models.Post, err error) {
+func GetPostList(ctx context.Context, page, size int64) (posts []*models.Post, err error) {
 	sqlStr := `select post_id, title, content, author_id, community_id, create_time 
 				from post 
 				order by create_time
@@ -33,7 +34,7 @@ func GetPostList(page, size int64) (posts []*models.Post, err error) {
 				limit ?, ?`
 	
 	posts = make([]*models.Post, 0, 2)
-	err = db.Raw(sqlStr, (page - 1) * size, size).Scan(&posts).Error
+	err = db.WithContext(ctx).Raw(sqlStr, (page - 1) * size, size).Scan(&posts).Error
 	return
 }
 

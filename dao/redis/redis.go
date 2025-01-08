@@ -2,9 +2,10 @@ package redis
 
 import (
 	"bluebell/settings"
+	"context"
 	"fmt"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 )
 
 var rdb *redis.Client
@@ -20,7 +21,7 @@ func Init(cfg *settings.RedisConfig) (err error) {
 		PoolSize:	cfg.PoolSize,
 	})
 
-	_, err = rdb.Ping().Result()
+	_, err = rdb.Ping(context.Background()).Result()
 	return
 }
 

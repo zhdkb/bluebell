@@ -12,7 +12,7 @@ import (
 
 func CommunityHandler(c *gin.Context) {
 	// 查询所有的社区（community_id, community_name）以列表的形式返回
-	data, err := logic.GetCommunityList()
+	data, err := logic.GetCommunityList(c.Request.Context())
 	if err != nil {
 		zap.L().Error("logic.GetCommunityList() failed", zap.Error(err))
 		ResponseError(c, CodeServerBusy)
@@ -31,7 +31,7 @@ func CommunityDetailHandler(c *gin.Context) {
 		return
 	}
 	// 根据id获取社区详情
-	data, err := logic.GetCommunityDetail(id)
+	data, err := logic.GetCommunityDetail(c.Request.Context(), id)
 	if err != nil {
 		zap.L().Error("logic.GetCommunityList() failed", zap.Error(err))
 		ResponseError(c, CodeServerBusy)
