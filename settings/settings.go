@@ -19,6 +19,7 @@ type AppConfig struct {
 	*LogConfig		`mapstructure:"log"`
 	*MySQLConfig	`mapstructure:"mysql"`
 	*RedisConfig	`mapstructure:"redis"`
+	*KafkaConfig	`mapstructure:"kafka"`
 }
 
 type LogConfig struct {
@@ -47,26 +48,30 @@ type RedisConfig struct {
 	PoolSize     int    `mapstructure:"pool_size"`
 }
 
+type KafkaConfig struct {
+	Brokers []string `mapstructure:"brokers"`
+}
+
 func Init() (err error) {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 	err = viper.ReadInConfig() // 读取配置信息
 	if err != nil {
-		fmt.Println("viper.ReadInConfig() failed, err:%v\n", err)
+		fmt.Printf("viper.ReadInConfig() failed, err:%v\n", err)
 		return
 	}
 
 	// 把读取到的配置信息反序列化到Conf变量中
 	if err := viper.Unmarshal(Conf); err != nil {
-		fmt.Println("viper.Unmarshal failed, err:%v\n", err)
+		fmt.Printf("viper.Unmarshal failed, err:%v\n", err)
 	}
 
 	viper.WatchConfig()
 	viper.OnConfigChange(func(in fsnotify.Event) {
-		fmt.Println("配置文件修改了...")
+		fmt.Printf("配置文件修改了...")
 		if err := viper.Unmarshal(Conf); err != nil {
-			fmt.Println("viper.Unmarshal failed, err:%v\n", err)
+			fmt.Printf("viper.Unmarshal failed, err:%v\n", err)
 		}
 	})
 	return

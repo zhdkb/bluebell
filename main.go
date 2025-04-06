@@ -4,6 +4,7 @@ import (
 	"bluebell/controllers"
 	"bluebell/dao/mysql"
 	"bluebell/dao/redis"
+	"bluebell/kafka"
 	"bluebell/logger"
 	"bluebell/pkg/snowflake"
 	"bluebell/routes"
@@ -19,6 +20,7 @@ func main() {
 		fmt.Printf("init settings failed, err:%v\n", err)
 		return
 	}
+
 	// 初始化日志
 	if err := logger.Init(settings.Conf.LogConfig, settings.Conf.Mode); err != nil {
 		fmt.Printf("init logger failed, err:%v\n", err)
@@ -26,12 +28,14 @@ func main() {
 	}
 	defer zap.L().Sync()
 	zap.L().Debug("logger init success...")
+
 	// 初始化MySQL
 	if err := mysql.Init(settings.Conf.MySQLConfig); err != nil {
 		fmt.Printf("init mysql failed, err:%v\n", err)
 		return
 	}
 	defer mysql.Close()
+
 	// 初始化Redis连接
 	if err := redis.Init(settings.Conf.RedisConfig); err != nil {
 		fmt.Printf("init redis failed, err:%v\n", err)
@@ -39,15 +43,24 @@ func main() {
 	}
 	defer redis.Close()
 
+	// 初始化Kafka连接
+	if err := kafka.Init(settings.Conf.KafkaConfig.Brokers); err != nil {
+		fmt.Printf("init kafka failed, err:%v\n", err)
+		return
+	}
+	defer kafka.GetManager().Close()
+
 	if err := snowflake.Init(settings.Conf.StartTime, settings.Conf.MachineID); err != nil {
 		fmt.Printf("init snowflake failed, err:%v\n", err)
 		return
 	}
+
 	// 初始化gin框架内置校验器使用的翻译器
 	if err := controllers.InitTrans("zh"); err != nil {
 		fmt.Printf("init validator trans failed, err:%v\n", err)
 		return
 	}
+
 	// 注册路由
 	r := routes.Setup(settings.Conf.Mode)
 	err := r.Run(fmt.Sprintf(":%d", settings.Conf.Port))
