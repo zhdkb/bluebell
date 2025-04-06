@@ -16,36 +16,36 @@ import (
 func main() {
 	// 加载配置
 	if err := settings.Init(); err != nil {
-		fmt.Println("init settings failed, err:%v\n", err)
+		fmt.Printf("init settings failed, err:%v\n", err)
 		return
 	}
 	// 初始化日志
 	if err := logger.Init(settings.Conf.LogConfig, settings.Conf.Mode); err != nil {
-		fmt.Println("init logger failed, err:%v\n", err)
+		fmt.Printf("init logger failed, err:%v\n", err)
 		return
 	}
 	defer zap.L().Sync()
 	zap.L().Debug("logger init success...")
 	// 初始化MySQL
 	if err := mysql.Init(settings.Conf.MySQLConfig); err != nil {
-		fmt.Println("init mysql failed, err:%v\n", err)
+		fmt.Printf("init mysql failed, err:%v\n", err)
 		return
 	}
 	defer mysql.Close()
 	// 初始化Redis连接
 	if err := redis.Init(settings.Conf.RedisConfig); err != nil {
-		fmt.Println("init redis failed, err:%v\n", err)
+		fmt.Printf("init redis failed, err:%v\n", err)
 		return
 	}
 	defer redis.Close()
 
 	if err := snowflake.Init(settings.Conf.StartTime, settings.Conf.MachineID); err != nil {
-		fmt.Println("init snowflake failed, err:%v\n", err)
+		fmt.Printf("init snowflake failed, err:%v\n", err)
 		return
 	}
 	// 初始化gin框架内置校验器使用的翻译器
 	if err := controllers.InitTrans("zh"); err != nil {
-		fmt.Println("init validator trans failed, err:%v\n", err)
+		fmt.Printf("init validator trans failed, err:%v\n", err)
 		return
 	}
 	// 注册路由
