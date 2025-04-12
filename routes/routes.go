@@ -25,6 +25,7 @@ func Setup(mode string) *gin.Engine {
 	// 注册业务路由
 	v1.POST("/signup", controllers.SignupHandler)
 	v1.POST("/login", controllers.LoginHandler)
+	v1.GET("/refreshtoken", controllers.RefreshHandler)
 
 	v1.Use(middlewares.JWTAuthMiddleware()) // 应用JWT认证中间件
 

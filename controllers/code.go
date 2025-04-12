@@ -12,6 +12,7 @@ const (
 	CodeNeedLogin
 	CodeInvalidToken
 	CodeTimeout
+	CodeCreateAccessToken
 )
 
 var codeMsgMap = map[ResCode]string{
@@ -25,6 +26,7 @@ var codeMsgMap = map[ResCode]string{
 	CodeNeedLogin:			"需要登录",
 	CodeInvalidToken:		"无效的token",
 	CodeTimeout:			"请求超时",
+	CodeCreateAccessToken:  "生成accesstoken失败",
 }
 
 func (c ResCode) Msg() string {

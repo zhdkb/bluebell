@@ -52,3 +52,11 @@ func ResponseTimeout(c *gin.Context, code ResCode, msg string) {
 		Data: nil,
 	})
 }
+
+func ResponseMsg(c *gin.Context, msg string) {
+	c.JSON(http.StatusOK, &ResponseData{
+		Code: CodeInvalidToken,
+		Msg: msg,
+		Data: nil,
+	})
+}

@@ -37,6 +37,12 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 			c.Abort()
 			return
 		}
+
+		if mc.Tokentype != "access" {
+			controllers.ResponseMsg(c, "token 类型错误")
+			c.Abort()
+			return
+		}
 		// 将当前请求的userID信息保存到请求的上下文c上
 		c.Set(controllers.CtxUserIDkey, mc.UserID)
 

@@ -6,6 +6,9 @@ import (
 	"bluebell/pkg/jwt"
 	"bluebell/pkg/snowflake"
 	"context"
+	"errors"
+	"time"
+
 )
 
 // 存放业务逻辑的代码
@@ -42,10 +45,29 @@ func Login(ctx context.Context, p *models.ParamLogin) (user *models.User, err er
 	}
 
 	// 生成JWT
-	token, err := jwt.GenToken(user.UserID, user.Username)
+	accesstoken, refreshtoken, err := jwt.GenDoubleToken(user.UserID, user.Username)
 	if err != nil {
 		return
 	}
-	user.Token = token
+	user.AccessToken = accesstoken
+	user.RefreshToken = refreshtoken
 	return
+}
+
+func Refresh(ctx context.Context, refreshtoken string) (string, string, error) {
+	mc, err := jwt.ParseToken(refreshtoken)
+	if err != nil {
+		return "", "", err
+	}
+
+	if mc.Tokentype != "refresh" {
+		return "", "", errors.New("token类型错误")
+	}
+
+	accesstoken, err := jwt.GenToken(mc.UserID, mc.Username, "access", time.Hour * 24 *7)
+	if err != nil {
+		return "", "", errors.New("access token 生成失败")
+	}
+
+	return accesstoken, refreshtoken, nil
 }

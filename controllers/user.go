@@ -82,7 +82,22 @@ func LoginHandler(c *gin.Context) {
 	ResponseSuccess(c, gin.H{
 		"user_id": fmt.Sprintf("%d", user.UserID),   // id值大于1<<53-1 int64类型的最大值是1<<63-1
 		"user_name": user.Username,
-		"token": user.Token,
+		"accescctoken": user.AccessToken,
+		"refreshtoken": user.RefreshToken,
 	})
 
+}
+
+// 根据refreshtoken获取accesstoken
+func RefreshHandler(c *gin.Context) {
+	refreshtoken := c.Query("refresh_token")
+	accesstoken, newrefreshtoken, err := logic.Refresh(c.Request.Context(), refreshtoken)
+	if err != nil {
+		ResponseError(c, CodeCreateAccessToken)
+	}
+
+	ResponseSuccess(c, gin.H{
+		"access_token": accesstoken,
+		"refresh_token": newrefreshtoken,
+	})
 }
