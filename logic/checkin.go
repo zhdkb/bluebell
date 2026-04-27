@@ -50,6 +50,51 @@ func CheckIn(ctx context.Context, userID int64) (*models.CheckInResult, error) {
 	return result, nil
 }
 
+func GetMonthlyCheckIn(ctx context.Context, userID int64, month string) (*models.CheckInMonthResult, error) {
+	targetMonth, err := parseCheckInMonth(month)
+	if err != nil {
+		return nil, err
+	}
+
+	// 月度打卡记录优先读 Redis bitmap；没有缓存时再查 MySQL。
+	days, ok, err := redis.GetMonthlyCheckInDays(ctx, userID, targetMonth)
+	if err != nil {
+		zap.L().Warn("redis.GetMonthlyCheckInDays failed", zap.Int64("userID", userID), zap.String("month", targetMonth.Format("2006-01")), zap.Error(err))
+	}
+	if ok && err == nil {
+		return &models.CheckInMonthResult{
+			UserID:      userID,
+			Month:       targetMonth.Format("2006-01"),
+			CheckInDays: days,
+			TotalDays:   len(days),
+		}, nil
+	}
+
+	days, err = mysql.GetMonthlyCheckInDays(ctx, userID, targetMonth)
+	if err != nil {
+		return nil, err
+	}
+	// MySQL 是最终事实源，回源成功后把结果写回 bitmap，加速下次查询。
+	if err := redis.CacheMonthlyCheckInDays(ctx, userID, targetMonth, days); err != nil {
+		zap.L().Warn("redis.CacheMonthlyCheckInDays failed", zap.Int64("userID", userID), zap.String("month", targetMonth.Format("2006-01")), zap.Error(err))
+	}
+
+	return &models.CheckInMonthResult{
+		UserID:      userID,
+		Month:       targetMonth.Format("2006-01"),
+		CheckInDays: days,
+		TotalDays:   len(days),
+	}, nil
+}
+
+func parseCheckInMonth(month string) (time.Time, error) {
+	if month == "" {
+		now := time.Now()
+		return time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location()), nil
+	}
+	return time.ParseInLocation("2006-01", month, time.Local)
+}
+
 func publishCheckInEvent(ctx context.Context, data *models.CheckInResult) {
 	manager := kafka.GetManager()
 	if manager == nil {

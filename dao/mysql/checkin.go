@@ -81,6 +81,29 @@ func CreateCheckIn(ctx context.Context, detail *models.CheckInDetail) (*models.C
 	return result, nil
 }
 
+// GetMonthlyCheckInDays 查询用户某个月的签到日期。
+func GetMonthlyCheckInDays(ctx context.Context, userID int64, month time.Time) ([]string, error) {
+	start := time.Date(month.Year(), month.Month(), 1, 0, 0, 0, 0, month.Location())
+	end := start.AddDate(0, 1, 0)
+
+	var dates []time.Time
+	sqlStr := `select sign_date
+				from user_checkin_detail
+				where user_id = ?
+					and sign_date >= ?
+					and sign_date < ?
+				order by sign_date asc`
+	if err := db.WithContext(ctx).Raw(sqlStr, userID, start, end).Scan(&dates).Error; err != nil {
+		return nil, err
+	}
+
+	days := make([]string, 0, len(dates))
+	for _, date := range dates {
+		days = append(days, date.Format("2006-01-02"))
+	}
+	return days, nil
+}
+
 func normalizeCheckInError(err error) error {
 	var mysqlErr *mysqlDriver.MySQLError
 	if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {

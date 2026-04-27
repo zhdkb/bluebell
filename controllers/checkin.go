@@ -30,3 +30,22 @@ func CheckInHandler(c *gin.Context) {
 
 	ResponseSuccess(c, data)
 }
+
+// CheckInMonthHandler 查询用户某个月的签到记录。
+func CheckInMonthHandler(c *gin.Context) {
+	userID, err := GetCurrentUserID(c)
+	if err != nil {
+		ResponseError(c, CodeNeedLogin)
+		return
+	}
+
+	month := c.Query("month")
+	data, err := logic.GetMonthlyCheckIn(c.Request.Context(), userID, month)
+	if err != nil {
+		zap.L().Error("logic.GetMonthlyCheckIn failed", zap.Int64("userID", userID), zap.String("month", month), zap.Error(err))
+		ResponseError(c, CodeInvalidParam)
+		return
+	}
+
+	ResponseSuccess(c, data)
+}

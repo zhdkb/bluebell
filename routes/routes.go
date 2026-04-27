@@ -45,6 +45,7 @@ func Setup(mode string) *gin.Engine {
 
 		// 签到
 		v1.POST("/checkin", controllers.CheckInHandler)
+		v1.GET("/checkin/month", controllers.CheckInMonthHandler)
 	}
 
 	r.NoRoute(func(c *gin.Context) {

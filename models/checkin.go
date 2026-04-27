@@ -36,3 +36,10 @@ type CheckInResult struct {
 	TotalCount      int    `json:"total_count"`
 	ContinuousCount int    `json:"continuous_count"`
 }
+
+type CheckInMonthResult struct {
+	UserID      int64    `json:"user_id,string"`
+	Month       string   `json:"month"`
+	CheckInDays []string `json:"checkin_days"`
+	TotalDays   int      `json:"total_days"`
+}
