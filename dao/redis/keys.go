@@ -11,6 +11,8 @@ const (
 	KeyPostVotedZsetPre = "post:voted:" // zset;记录用户及投票的类型;参数是post_id
 	
 	KeyCommunitySetPF = "community:" // set;保存每个分区下帖子的id
+	KeyCheckInDailyPF = "checkin:daily:" // string;参数是user_id:yyyy-mm-dd，防止重复签到
+	KeyCheckInCountPF = "checkin:count:" // hash;参数是user_id，缓存签到统计
 )
 
 func getRedisKey(key string) string {

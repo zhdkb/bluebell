@@ -10,7 +10,7 @@ var manager *Manager
 
 // Init 初始化Kafka管理器
 func Init(brokers []string) error {
-	topics := []string{TopicLike}
+	topics := []string{TopicLike, TopicCheckIn}
 	var err error
 	manager, err = createManager(brokers, topics, "my-group")
 	if err != nil {
@@ -27,7 +27,6 @@ func Init(brokers []string) error {
 	return nil
 }
 
-
 // GetManager 获取Kafka管理器
 func GetManager() *Manager {
 	if manager == nil {
@@ -36,7 +35,6 @@ func GetManager() *Manager {
 	}
 	return manager
 }
-
 
 // Close 关闭Kafka管理器
 func (km *Manager) Close() {

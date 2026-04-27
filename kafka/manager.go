@@ -13,6 +13,18 @@ type Manager struct {
 	Readers map[string]*kafka.Reader
 }
 
+// Publish 向指定主题发送消息。
+func (km *Manager) Publish(ctx context.Context, topic string, key, value []byte) error {
+	writer, ok := km.Writers[topic]
+	if !ok {
+		return kafka.UnknownTopicOrPartition
+	}
+	return writer.WriteMessages(ctx, kafka.Message{
+		Key:   key,
+		Value: value,
+	})
+}
+
 // createManager 创建Kafka管理器
 func createManager(brokers []string, topic []string, groupID string) (*Manager, error) {
 	writers := make(map[string]*kafka.Writer)
@@ -37,8 +49,8 @@ func createManager(brokers []string, topic []string, groupID string) (*Manager, 
 	// 初始化生产者和消费者
 	for _, t := range topic {
 		writers[t] = &kafka.Writer{
-			Addr: kafka.TCP(brokers...),
-			Topic: t,
+			Addr:     kafka.TCP(brokers...),
+			Topic:    t,
 			Balancer: &kafka.LeastBytes{},
 		}
 
@@ -71,5 +83,3 @@ func (km *Manager) startConsumer(ctx context.Context, topic string) {
 	}
 
 }
-
-

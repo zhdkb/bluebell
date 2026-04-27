@@ -40,9 +40,11 @@ func Setup(mode string) *gin.Engine {
 		// 根据时间或分数获取帖子列表
 		v1.GET("/posts2", controllers.GetPostListHandler2)
 
-
 		// 投票
 		v1.POST("/vote", controllers.PostVoteController)
+
+		// 签到
+		v1.POST("/checkin", controllers.CheckInHandler)
 	}
 
 	r.NoRoute(func(c *gin.Context) {
@@ -50,7 +52,6 @@ func Setup(mode string) *gin.Engine {
 			"msg": "404",
 		})
 	})
-	
+
 	return r
 }
-

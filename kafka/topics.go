@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	TopicLike = "like" // 点赞主题
+	TopicLike    = "like"    // 点赞主题
+	TopicCheckIn = "checkin" // 签到主题
 )
 
 // createTopics 创建Kafka主题

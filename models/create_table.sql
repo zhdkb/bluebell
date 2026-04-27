@@ -47,3 +47,31 @@ CREATE TABLE `post` (
     KEY `idx_author_id` (`author_id`),
     KEY `idx_community_id` (`community_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `user_checkin_detail`;
+CREATE TABLE `user_checkin_detail` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `checkin_id` bigint(20) NOT NULL COMMENT '签到记录id',
+    `user_id` bigint(20) NOT NULL COMMENT '用户id',
+    `sign_date` date NOT NULL COMMENT '签到日期',
+    `sign_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '签到时间',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `idx_checkin_id` (`checkin_id`),
+    UNIQUE KEY `idx_user_sign_date` (`user_id`, `sign_date`),
+    KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `user_checkin_count`;
+CREATE TABLE `user_checkin_count` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `user_id` bigint(20) NOT NULL COMMENT '用户id',
+    `total_count` int(11) NOT NULL DEFAULT '0' COMMENT '累计签到次数',
+    `continuous_count` int(11) NOT NULL DEFAULT '0' COMMENT '连续签到次数',
+    `last_sign_date` date NOT NULL COMMENT '上一次签到日期',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
