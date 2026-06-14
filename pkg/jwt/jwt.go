@@ -1,7 +1,9 @@
 package jwt
 
 import (
+	"bluebell/pkg/snowflake"
 	"errors"
+	"strconv"
 	"sync"
 	"time"
 
@@ -13,9 +15,9 @@ const TokenExpireDuration = time.Hour * 24 * 365
 var mySecret = []byte("夏天夏天悄悄过去")
 
 type MyClaims struct {
-	UserID		int64	`json:"user_id"`
-	Username	string	`json:"username"`
-	Tokentype	string	`json:"tokentype"`
+	UserID    int64  `json:"user_id"`
+	Username  string `json:"username"`
+	Tokentype string `json:"tokentype"`
 	jwt.RegisteredClaims
 }
 
@@ -23,12 +25,13 @@ type MyClaims struct {
 func GenToken(userID int64, username string, tokentype string, validTime time.Duration) (string, error) {
 	// 创建一个我们自己的声明的数据
 	c := MyClaims{
-		UserID: userID,
-		Username: username,
+		UserID:    userID,
+		Username:  username,
 		Tokentype: tokentype,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(validTime)),
 			Issuer:    "bluebell",
+			ID:        strconv.FormatInt(snowflake.GenID(), 10),
 		},
 	}
 	// 使用指定的签名方法创建签名对象
@@ -46,15 +49,15 @@ func GenDoubleToken(userID int64, username string) (string, string, error) {
 
 	go func() {
 		defer wg.Done()
-		accessTokenstr, err := GenToken(userID, username, "access", time.Hour * 24 * 7)
+		accessTokenstr, err := GenToken(userID, username, "access", time.Hour*24*7)
 		if err != nil {
 			errapichan <- err
 			return
 		}
 		accessToken = accessTokenstr
-	} ()
+	}()
 
-	go func ()  {
+	go func() {
 		defer wg.Done()
 		refreshTokenstr, err := GenToken(userID, username, "refresh", TokenExpireDuration)
 		if err != nil {
@@ -62,12 +65,12 @@ func GenDoubleToken(userID int64, username string) (string, string, error) {
 			return
 		}
 		refreshToken = refreshTokenstr
-	} ()
+	}()
 
-	go func ()  {
+	go func() {
 		wg.Wait()
 		close(errapichan)
-	} ()
+	}()
 
 	for err := range errapichan {
 		if err != nil {
@@ -76,7 +79,7 @@ func GenDoubleToken(userID int64, username string) (string, string, error) {
 	}
 
 	return accessToken, refreshToken, nil
-	
+
 }
 
 // ParseToken 解析JWT

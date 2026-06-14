@@ -1,4 +1,7 @@
 {
+    "go.toolsEnvVars": {
+        "GOCACHE": "/private/tmp/bluebell-go-cache"
+    },
     "sqltools.connections": [
         {
             "mysqlOptions": {

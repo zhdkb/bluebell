@@ -28,34 +28,6 @@ func GetPostIDsInorder(ctx context.Context, p *models.ParamPostList) ([]string, 
 	return getIDsFromKey(ctx, key, p.Page, p.Size)
 }
 
-// GetPostVoteData 根据ids查询每篇帖子的投赞成票的数据
-func GetPostVoteData(ctx context.Context, ids []string) (data []int64, err error) {
-	data = make([]int64, 0)
-	for _, id := range(ids) {
-		key := getRedisKey(KeyPostVotedZsetPre + id)
-		// 查找key中分数是1的元素的数量 -> 统计每篇帖子的赞成票的数量
-		v1 := rdb.ZCount(ctx, key, "1", "1").Val()
-		data = append(data, v1)
-	}
-
-	// // 使用pipeline一次发送多条命令，减少RTT
-	// pipeline := rdb.Pipeline()
-	// for _, id := range ids {
-	// 	key := getRedisKey(KeyPostVotedZsetPre + id)
-	// 	pipeline.ZCount(key, "1", "1")
-	// }
-	// cmders, err := pipeline.Exec()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// data = make([]int64, 0)
-	// for _, cmder := range cmders {
-	// 	v := cmder.(*redis.IntCmd).Val()
-	// 	data = append(data, v)
-	// }
-	return
-}
-
 // GetCommunityPostIDsInorder 按社区查询ids
 func GetCommunityPostIDsInorder(ctx context.Context, p *models.ParamPostList) ([]string, error) {
 	orderKey := getRedisKey(KeyPostTimeZSet)
@@ -78,7 +50,7 @@ func GetCommunityPostIDsInorder(ctx context.Context, p *models.ParamPostList) ([
 			Aggregate: "MAX",
 			Keys:      []string{cKey, orderKey},
 		}) // ZInterStore 计算
-		pipeline.Expire(ctx, key, 60 * time.Second)
+		pipeline.Expire(ctx, key, 60*time.Second)
 		_, err := pipeline.Exec(ctx)
 		if err != nil {
 			return nil, err

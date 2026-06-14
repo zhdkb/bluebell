@@ -9,13 +9,14 @@ import (
 	"go.uber.org/zap"
 )
 
-func PostVoteController(c *gin.Context) {
+func PostLikeController(c *gin.Context) {
 	// 参数校验
-	p := new(models.ParamVoteData)
+	p := new(models.ParamLikeData)
 	if err := c.ShouldBindJSON(p); err != nil {
 		errs, ok := err.(validator.ValidationErrors) // 类型断言
 		if !ok {
 			ResponseError(c, CodeInvalidParam)
+			return
 		}
 		errData := removeTopStruct(errs.Translate(trans))
 		ResponseErrorWithMsg(c, CodeInvalidParam, errData)
@@ -26,12 +27,14 @@ func PostVoteController(c *gin.Context) {
 	userID, err := GetCurrentUserID(c)
 	if err != nil {
 		ResponseError(c, CodeNeedLogin)
+		return
 	}
-	// 具体投票业务逻辑
-	if err := logic.VoteForPost(c.Request.Context(), userID, p); err != nil {
-		zap.L().Error("logic.VoteForPost() failed", zap.Error(err))
+	// 具体点赞业务逻辑
+	data, err := logic.LikePost(c.Request.Context(), userID, p)
+	if err != nil {
+		zap.L().Error("logic.LikePost() failed", zap.Error(err))
 		ResponseError(c, CodeServerBusy)
 		return
 	}
-	ResponseSuccess(c, nil)
+	ResponseSuccess(c, data)
 }

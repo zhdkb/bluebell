@@ -24,9 +24,13 @@ func createTopics(brokers []string, topics []string) error {
 
 	var topicConfigs []kafka.TopicConfig
 	for _, t := range topics {
+		numPartitions := 1
+		if t == TopicLike {
+			numPartitions = 8
+		}
 		topicConfigs = append(topicConfigs, kafka.TopicConfig{
 			Topic:             t,
-			NumPartitions:     1,
+			NumPartitions:     numPartitions,
 			ReplicationFactor: 1,
 		})
 	}

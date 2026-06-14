@@ -39,6 +39,7 @@ CREATE TABLE `post` (
     `content` varchar(8192) COLLATE utf8mb4_general_ci NOT NULL COMMENT '内容',
     `author_id` bigint(20) NOT NULL COMMENT '作者的用户id',
     `community_id` bigint(20) NOT NULL COMMENT '所属社区',
+    `like_count` bigint(20) NOT NULL DEFAULT '0' COMMENT '点赞数',
     `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '帖子状态',
     `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -46,6 +47,67 @@ CREATE TABLE `post` (
     UNIQUE KEY `idx_post_id` (`post_id`),
     KEY `idx_author_id` (`author_id`),
     KEY `idx_community_id` (`community_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `comment`;
+CREATE TABLE `comment` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `comment_id` bigint(20) NOT NULL COMMENT '评论id',
+    `post_id` bigint(20) NOT NULL COMMENT '评论所属帖子id',
+    `author_id` bigint(20) NOT NULL COMMENT '评论作者用户id',
+    `author_name` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '评论作者名',
+    `content` varchar(2048) COLLATE utf8mb4_general_ci NOT NULL COMMENT '评论内容',
+    `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '1正常，0删除',
+    `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `delete_time` bigint(20) NOT NULL DEFAULT '0' COMMENT '逻辑删除时间，0表示未删除',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `idx_comment_id` (`comment_id`),
+    KEY `idx_post_id` (`post_id`),
+    KEY `idx_author_id` (`author_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `comment_relation`;
+CREATE TABLE `comment_relation` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `post_id` bigint(20) NOT NULL COMMENT '评论所属帖子id',
+    `comment_id` bigint(20) NOT NULL COMMENT '当前评论id',
+    `parent_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '父评论id，0表示一级评论',
+    `reply_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '被回复的评论id',
+    `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `delete_time` bigint(20) NOT NULL DEFAULT '0' COMMENT '逻辑删除时间，0表示未删除',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `idx_comment_id` (`comment_id`),
+    KEY `idx_post_parent` (`post_id`, `parent_id`),
+    KEY `idx_reply_id` (`reply_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `post_like`;
+CREATE TABLE `post_like` (
+    `post_id` bigint(20) NOT NULL COMMENT '帖子id',
+    `user_id` bigint(20) NOT NULL COMMENT '用户id',
+    `liked` tinyint(4) NOT NULL DEFAULT '1' COMMENT '1点赞，0取消点赞',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`post_id`, `user_id`),
+    KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `like_event_failed`;
+CREATE TABLE `like_event_failed` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `event_id` bigint(20) NOT NULL COMMENT '点赞事件id',
+    `post_id` bigint(20) NOT NULL COMMENT '帖子id',
+    `user_id` bigint(20) NOT NULL COMMENT '用户id',
+    `liked` tinyint(4) NOT NULL COMMENT '1点赞，0取消点赞',
+    `delta` bigint(20) NOT NULL COMMENT '点赞数变化',
+    `retry_count` int(11) NOT NULL DEFAULT '0' COMMENT '重试次数',
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `idx_event_id` (`event_id`),
+    KEY `idx_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `user_checkin_detail`;

@@ -40,8 +40,20 @@ func Setup(mode string) *gin.Engine {
 		// 根据时间或分数获取帖子列表
 		v1.GET("/posts2", controllers.GetPostListHandler2)
 
-		// 投票
-		v1.POST("/vote", controllers.PostVoteController)
+		// 评论
+		v1.GET("/comment/top", controllers.GetTopComments)
+		v1.GET("/comment/sub", controllers.GetSubComments)
+		v1.POST("/comment", controllers.CreateComment)
+		v1.PUT("/comment", controllers.UpdateComment)
+		v1.DELETE("/comment", controllers.DeleteComment)
+		v1.GET("/comment/count", controllers.GetCommentCount)
+		v1.GET("/comment/top/count", controllers.GetTopCommentCount)
+		v1.GET("/comment/sub/count", controllers.GetSubCommentCount)
+		v1.GET("/comment/user/count", controllers.GetCommentCountByUserID)
+		v1.GET("/comment", controllers.GetCommentByCommentID)
+
+		// 点赞
+		v1.POST("/like", controllers.PostLikeController)
 
 		// 签到
 		v1.POST("/checkin", controllers.CheckInHandler)

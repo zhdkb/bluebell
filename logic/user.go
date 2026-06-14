@@ -2,13 +2,12 @@ package logic
 
 import (
 	"bluebell/dao/mysql"
+	"bluebell/dao/redis"
 	"bluebell/models"
 	"bluebell/pkg/jwt"
 	"bluebell/pkg/snowflake"
 	"context"
 	"errors"
-	"time"
-
 )
 
 // 存放业务逻辑的代码
@@ -24,9 +23,9 @@ func SignUp(ctx context.Context, p *models.ParamSignUp) (err error) {
 	userID := snowflake.GenID()
 	// 构造一个User实例
 	user := &models.User{
-		UserID:		userID,
-		Username: 	p.Username,
-		Password: 	p.Password,
+		UserID:   userID,
+		Username: p.Username,
+		Password: p.Password,
 	}
 	// 保存进数据库
 	return mysql.InsertUser(ctx, user)
@@ -64,10 +63,29 @@ func Refresh(ctx context.Context, refreshtoken string) (string, string, error) {
 		return "", "", errors.New("token类型错误")
 	}
 
-	accesstoken, err := jwt.GenToken(mc.UserID, mc.Username, "access", time.Hour * 24 *7)
-	if err != nil {
-		return "", "", errors.New("access token 生成失败")
+	if mc.ID == "" {
+		return "", "", errors.New("refresh token缺少jti")
+	}
+	if mc.ExpiresAt == nil {
+		return "", "", errors.New("refresh token缺少过期时间")
 	}
 
-	return accesstoken, refreshtoken, nil
+	blacklisted, err := redis.IsRefreshTokenBlacklisted(ctx, mc.ID)
+	if err != nil {
+		return "", "", err
+	}
+	if blacklisted {
+		return "", "", errors.New("refresh token已失效")
+	}
+
+	accesstoken, newrefreshtoken, err := jwt.GenDoubleToken(mc.UserID, mc.Username)
+	if err != nil {
+		return "", "", errors.New("token 生成失败")
+	}
+
+	if err := redis.BlacklistRefreshToken(ctx, mc.ID, mc.ExpiresAt.Time); err != nil {
+		return "", "", err
+	}
+
+	return accesstoken, newrefreshtoken, nil
 }

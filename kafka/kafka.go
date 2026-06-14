@@ -2,11 +2,14 @@ package kafka
 
 import (
 	"context"
+	"errors"
 
 	"go.uber.org/zap"
 )
 
 var manager *Manager
+
+var ErrManagerNotReady = errors.New("kafka manager not ready")
 
 // Init 初始化Kafka管理器
 func Init(brokers []string) error {
@@ -23,6 +26,7 @@ func Init(brokers []string) error {
 	for _, topic := range topics {
 		go manager.startConsumer(context.Background(), topic)
 	}
+	go manager.startFailedLikeEventRetry(context.Background())
 
 	return nil
 }
