@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // gin.Context 是一个非常重要的结构体，
@@ -20,6 +21,9 @@ func Setup(mode string) *gin.Engine {
 	r := gin.New()
 
 	r.Use(logger.GinLogger(), logger.GinRecovery(true))
+
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	r.Use(controllers.PrometheusMiddleware())
 
 	v1 := r.Group("/api/v1").Use(controllers.TimeoutMiddleware())
 	// 注册业务路由

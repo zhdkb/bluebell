@@ -6,6 +6,7 @@ import (
 	"bluebell/dao/redis"
 	"bluebell/kafka"
 	"bluebell/logger"
+	"bluebell/metrics"
 	"bluebell/pkg/snowflake"
 	"bluebell/routes"
 	"bluebell/settings"
@@ -28,6 +29,8 @@ func main() {
 	}
 	defer zap.L().Sync()
 	zap.L().Debug("logger init success...")
+
+	metrics.Init(settings.Conf.Name)
 
 	// 初始化MySQL
 	if err := mysql.Init(settings.Conf.MySQLConfig); err != nil {
